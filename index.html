@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manger à McGill — The world's biggest tire sur la neige</title>
+<meta name="description" content="Join McGill in setting a world record for the most people eating tire sur la neige at the same time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --snow: #F5F8FA;
+    --frost: #DCE6EC;
+    --bark: #3A2418;
+    --bark-deep: #2A190F;
+    --syrup: #B9661A;
+    --syrup-light: #E7A54A;
+    --plaid: #A8242C;
+    --ink: #22150E;
+    --display: "Alfa Slab One", "Rockwell", "Roboto Slab", Georgia, serif;
+    --body: "Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--body); font-size: 1.125rem; line-height: 1.6; color: var(--ink); background: var(--snow); }
+  img, canvas { max-width: 100%; display: block; }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--syrup-light); outline-offset: 3px; border-radius: 4px; }
+  .wrap { width: min(1120px, 100% - 2.5rem); margin-inline: auto; }
+  h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.08; }
+  h2 { font-size: clamp(2rem, 4.5vw, 3rem); margin-bottom: 1rem; }
+  p + p { margin-top: .9rem; }
+
+  /* Nav */
+  .nav { background: var(--bark-deep); color: var(--snow); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: .9rem; }
+  .brand { font-family: var(--display); font-size: 1.25rem; text-decoration: none; }
+  .nav ul { list-style: none; display: flex; gap: 1.5rem; }
+  .nav ul a { text-decoration: none; font-weight: 600; opacity: .85; }
+  .nav ul a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
+  .btn { display: inline-block; font: 700 1.05rem var(--body); background: var(--syrup); color: #fff; border: 0; border-radius: 999px; padding: .85rem 1.6rem; text-decoration: none; cursor: pointer; transition: background .15s; }
+  .btn:hover { background: #A2560F; }
+  .btn-small { padding: .5rem 1.1rem; font-size: .95rem; }
+
+  /* Hero */
+  .hero {
+    color: var(--snow);
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 2px, transparent 2px 9px),
+      repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 1px, transparent 1px 37px),
+      var(--bark);
+    padding-block: clamp(3rem, 7vw, 5.5rem);
+  }
+  .hero .wrap { display: grid; grid-template-columns: 1fr 1.05fr; gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+  .hero h1 { font-size: clamp(2.6rem, 6.5vw, 4.75rem); letter-spacing: -.01em; }
+  .hero-lede { font-size: 1.25rem; max-width: 34ch; margin-top: 1.25rem; color: #EADFD5; }
+  .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; margin-top: 2rem; }
+  .hero-meta { color: #D9C9BA; font-weight: 600; }
+
+  .trough { background: #6B4528; padding: 14px; border-radius: 10px; box-shadow: inset 0 0 0 3px #4E311C, 0 18px 40px rgba(0,0,0,.35); }
+  .trough canvas { width: 100%; aspect-ratio: 5 / 4; border-radius: 4px; background: var(--snow); cursor: crosshair; touch-action: none; }
+  .trough-caption { display: flex; justify-content: space-between; gap: 1rem; margin-top: .75rem; font-size: .95rem; color: #E6D8CA; }
+  .trough-caption button { background: none; border: 0; color: inherit; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+
+  /* Plaid band */
+  .plaid {
+    height: 44px;
+    background:
+      repeating-linear-gradient(90deg, rgba(0,0,0,.55) 0 22px, transparent 22px 44px),
+      repeating-linear-gradient(0deg, rgba(0,0,0,.55) 0 22px, transparent 22px 44px),
+      var(--plaid);
+  }
+
+  /* Counter */
+  .counter { padding-block: clamp(3rem, 6vw, 4.5rem); }
+  .counter .wrap { display: grid; grid-template-columns: 1.2fr 1fr; gap: 3rem; align-items: center; }
+  .count-num { font-family: var(--display); font-size: clamp(3rem, 8vw, 5.5rem); line-height: 1; color: var(--syrup); }
+  .count-label { font-weight: 600; margin-top: .5rem; }
+  .bar { height: 18px; background: var(--frost); border-radius: 999px; overflow: hidden; margin-top: 1.25rem; }
+  .bar span { display: block; height: 100%; width: 0; background: var(--syrup); border-radius: inherit; transition: width .8s ease; }
+  .countdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: .75rem; text-align: center; }
+  .countdown div { background: #fff; border: 2px solid var(--frost); border-radius: 8px; padding: 1rem .25rem; }
+  .countdown strong { display: block; font-family: var(--display); font-weight: 400; font-size: clamp(1.6rem, 4vw, 2.4rem); color: var(--bark); }
+  .countdown small { font-size: .9rem; color: #5B4A3F; }
+  .countdown-title { font-weight: 700; margin-bottom: .75rem; }
+
+  /* About */
+  .about { background: #fff; padding-block: clamp(3.5rem, 7vw, 5.5rem); border-block: 2px solid var(--frost); }
+  .about .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 4rem); }
+  .about p { max-width: 60ch; }
+
+  /* Steps */
+  .steps { padding-block: clamp(3.5rem, 7vw, 5.5rem); }
+  .steps ol { list-style: none; counter-reset: step; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-top: 2rem; }
+  .steps li { counter-increment: step; border-top: 4px solid var(--bark); padding-top: 1rem; }
+  .steps li::before { content: counter(step); font-family: var(--display); font-size: 2.5rem; color: var(--syrup); display: block; line-height: 1; margin-bottom: .5rem; }
+  .steps h3 { font-size: 1.3rem; margin-bottom: .4rem; }
+
+  /* Details */
+  .details { background: var(--bark); color: var(--snow); padding-block: clamp(3.5rem, 7vw, 5.5rem); }
+  .details dl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 1.5rem; }
+  .details dt { font-weight: 700; color: var(--syrup-light); }
+  .details dd { font-size: 1.3rem; margin-top: .25rem; }
+  .details .note { margin-top: 2rem; color: #D9C9BA; max-width: 60ch; }
+
+  /* Register */
+  .register { padding-block: clamp(3.5rem, 7vw, 5.5rem); }
+  .register .wrap { display: grid; grid-template-columns: 1fr 1.2fr; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
+  form { background: #fff; border: 2px solid var(--frost); border-radius: 12px; padding: clamp(1.25rem, 3vw, 2rem); display: grid; gap: 1.1rem; }
+  label { font-weight: 700; display: block; margin-bottom: .35rem; }
+  input[type="text"], input[type="email"], select {
+    width: 100%; font: inherit; padding: .7rem .85rem; border: 2px solid #C9D5DC; border-radius: 8px; background: var(--snow); color: var(--ink);
+  }
+  input:focus, select:focus { border-color: var(--syrup); outline: none; box-shadow: 0 0 0 3px rgba(185,102,26,.25); }
+  .check { display: flex; gap: .6rem; align-items: flex-start; font-weight: 400; }
+  .check input { margin-top: .35rem; width: 1.1rem; height: 1.1rem; accent-color: var(--syrup); }
+  .error { color: var(--plaid); font-size: .95rem; margin-top: .3rem; min-height: 1em; }
+  .success { display: none; background: #FFF6EA; border: 2px solid var(--syrup-light); border-radius: 12px; padding: 1.5rem; }
+  .success.show { display: block; }
+  .success h3 { font-size: 1.6rem; margin-bottom: .5rem; }
+
+  /* FAQ */
+  .faq { background: #fff; border-top: 2px solid var(--frost); padding-block: clamp(3.5rem, 7vw, 5.5rem); }
+  .faq .wrap { max-width: 780px; }
+  details { border-bottom: 2px solid var(--frost); padding-block: 1rem; }
+  summary { font-weight: 700; font-size: 1.2rem; cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 1rem; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-family: var(--display); color: var(--syrup); }
+  details[open] summary::after { content: "–"; }
+  details p { margin-top: .6rem; max-width: 65ch; }
+
+  footer { background: var(--bark-deep); color: #D9C9BA; padding-block: 2rem; font-size: .95rem; }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; }
+
+  @media (max-width: 860px) {
+    .hero .wrap, .counter .wrap, .about .wrap, .register .wrap { grid-template-columns: 1fr; }
+    .steps ol { grid-template-columns: 1fr 1fr; }
+    .details dl { grid-template-columns: 1fr; }
+    .nav ul { display: none; }
+  }
+  @media (max-width: 480px) {
+    .steps ol { grid-template-columns: 1fr; }
+    .countdown { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .bar span { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <div class="wrap">
+    <a class="brand" href="#top">Manger à McGill</a>
+    <ul>
+      <li><a href="#about">The record</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#details">Details</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <a class="btn btn-small" href="#register">Register</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <h1>Thousands of sticks. One pour. A world record.</h1>
+      <p class="hero-lede">McGill is going for the record for the most people eating tire sur la neige at the same time. Grab a stick and be part of it.</p>
+      <div class="hero-actions">
+        <a class="btn" href="#register">Register to participate</a>
+        <span class="hero-meta" data-config="dateShort"></span>
+      </div>
+    </div>
+    <figure>
+      <div class="trough">
+        <canvas id="snow" aria-label="A tray of snow. Drag across it to pour maple taffy." role="img"></canvas>
+      </div>
+      <figcaption class="trough-caption">
+        <span>Drag across the snow to pour your own taffy.</span>
+        <button type="button" id="clearSnow">Fresh snow</button>
+      </figcaption>
+    </figure>
+  </div>
+</header>
+
+<div class="plaid" aria-hidden="true"></div>
+
+<section class="counter" aria-labelledby="count-title">
+  <div class="wrap">
+    <div>
+      <h2 id="count-title" class="visually-plain">Who's in so far</h2>
+      <div class="count-num" id="countNum">0</div>
+      <p class="count-label">people registered of our <span data-config="goalText"></span> goal</p>
+      <div class="bar" role="progressbar" aria-label="Registration progress" aria-valuemin="0" aria-valuemax="100" id="bar"><span></span></div>
+    </div>
+    <div>
+      <p class="countdown-title">Until the pour</p>
+      <div class="countdown" id="countdown">
+        <div><strong id="cd-d">–</strong><small>days</small></div>
+        <div><strong id="cd-h">–</strong><small>hours</small></div>
+        <div><strong id="cd-m">–</strong><small>minutes</small></div>
+        <div><strong id="cd-s">–</strong><small>seconds</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div class="wrap">
+    <div>
+      <h2>A sugar shack classic, on a record scale</h2>
+    </div>
+    <div>
+      <p>Tire sur la neige is about as Québécois as it gets: maple syrup boiled until it's thick, poured in ribbons over fresh snow, then rolled up on a wooden stick while it's still soft.</p>
+      <p>Usually it happens at a cabane à sucre with a few dozen people around one table of snow. We want to do it with the whole McGill community, all at once, on campus.</p>
+      <p>Every person who registers and eats on the countdown counts toward the record.</p>
+    </div>
+  </div>
+</section>
+
+<section class="steps" id="how">
+  <div class="wrap">
+    <h2>How the attempt works</h2>
+    <ol>
+      <li><h3>Check in</h3><p>Show your registration email at the gate and get your wristband.</p></li>
+      <li><h3>Get your stick</h3><p>Volunteers hand out wooden sticks and guide you to a spot along the snow tables.</p></li>
+      <li><h3>Watch the pour</h3><p>Hot syrup goes down on the snow in front of you. Don't touch it yet.</p></li>
+      <li><h3>Roll on the countdown</h3><p>When the clock hits zero, everyone rolls and eats together. That's the record.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="details" id="details">
+  <div class="wrap">
+    <h2>Event details</h2>
+    <dl>
+      <div><dt>When</dt><dd data-config="dateLong"></dd></div>
+      <div><dt>Where</dt><dd data-config="location"></dd></div>
+      <div><dt>Cost</dt><dd data-config="cost"></dd></div>
+    </dl>
+    <p class="note">Dress for the cold: you'll be standing outside for about an hour. Arrive early, as check-in closes before the countdown starts.</p>
+  </div>
+</section>
+
+<section class="register" id="register">
+  <div class="wrap">
+    <div>
+      <h2>Register to participate</h2>
+      <p>Only registered participants can be counted, so sign up before the day. It takes under a minute.</p>
+    </div>
+    <div>
+      <form id="regForm" novalidate>
+        <div>
+          <label for="name">Full name</label>
+          <input id="name" name="name" type="text" autocomplete="name" required>
+          <p class="error" id="err-name"></p>
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" required>
+          <p class="error" id="err-email"></p>
+        </div>
+        <div>
+          <label for="group">I'm joining as</label>
+          <select id="group" name="group" required>
+            <option value="">Choose one</option>
+            <option>McGill student</option>
+            <option>McGill staff or faculty</option>
+            <option>Alumni</option>
+            <option>Friend or community member</option>
+          </select>
+          <p class="error" id="err-group"></p>
+        </div>
+        <div>
+          <label class="check"><input type="checkbox" id="agree" required> I'll be there for the countdown and agree to the event guidelines.</label>
+          <p class="error" id="err-agree"></p>
+        </div>
+        <button class="btn" type="submit">Register to participate</button>
+      </form>
+      <div class="success" id="success" role="status" tabindex="-1">
+        <h3>You're registered</h3>
+        <p>Thanks, <span id="successName"></span>. We'll email your confirmation and check-in details to <span id="successEmail"></span> before the event.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="wrap">
+    <h2>Questions</h2>
+    <details><summary>Who can take part?</summary><p>Anyone who registers: students, staff, alumni, and friends of McGill. Participants under 18 should register with a parent or guardian.</p></details>
+    <details><summary>What's in tire sur la neige?</summary><p>Just pure maple syrup boiled down and cooled on snow. It's sticky and very sweet, so take it easy on dental work.</p></details>
+    <details><summary>Do I need to bring anything?</summary><p>Warm clothes, gloves you don't mind getting sticky, and your registration email. We provide the sticks, snow, and syrup.</p></details>
+    <details><summary>What if it doesn't snow?</summary><p>We'll bring in clean snow for the tables, so the attempt goes ahead either way. Watch your email for any weather updates.</p></details>
+    <details><summary>Can I volunteer instead?</summary><p>Yes. Volunteers help with check-in, handing out sticks, and counting. Email us and we'll add you to the volunteer list.</p></details>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Manger à McGill · Montréal</span>
+    <a href="mailto:hello@example.com" data-config-href="email"><span data-config="email"></span></a>
+  </div>
+</footer>
+
+<script>
+  /* ========= EDIT YOUR EVENT INFO HERE ========= */
+  const CONFIG = {
+    eventDate: "2027-02-20T14:00:00-05:00",   // ISO date & time of the countdown
+    dateShort: "February 20, 2027 · Montréal",
+    dateLong:  "Saturday, February 20, 2027, 2:00 p.m.",
+    location:  "Lower Field, McGill downtown campus",
+    cost:      "Free to participate",
+    goal:      2000,                           // registration goal
+    registered: 0,                             // current number registered
+    email:     "hello@example.com"
+  };
+  /* ============================================= */
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Fill config text
+  document.querySelectorAll("[data-config]").forEach(el => {
+    const key = el.dataset.config;
+    if (key === "goalText") el.textContent = CONFIG.goal.toLocaleString("en-CA");
+    else if (CONFIG[key] !== undefined) el.textContent = CONFIG[key];
+  });
+  document.querySelectorAll("[data-config-href]").forEach(el => { el.href = "mailto:" + CONFIG.email; });
+
+  // Counter
+  let registered = CONFIG.registered;
+  const countNum = document.getElementById("countNum");
+  const bar = document.getElementById("bar");
+  function renderCount() {
+    countNum.textContent = registered.toLocaleString("en-CA");
+    const pct = Math.min(100, (registered / CONFIG.goal) * 100);
+    bar.querySelector("span").style.width = pct + "%";
+    bar.setAttribute("aria-valuenow", Math.round(pct));
+  }
+  renderCount();
+
+  // Countdown
+  const target = new Date(CONFIG.eventDate).getTime();
+  const pad = n => String(n).padStart(2, "0");
+  function tick() {
+    let diff = Math.max(0, target - Date.now());
+    const d = Math.floor(diff / 86400000); diff -= d * 86400000;
+    const h = Math.floor(diff / 3600000);  diff -= h * 3600000;
+    const m = Math.floor(diff / 60000);    diff -= m * 60000;
+    const s = Math.floor(diff / 1000);
+    document.getElementById("cd-d").textContent = d;
+    document.getElementById("cd-h").textContent = pad(h);
+    document.getElementById("cd-m").textContent = pad(m);
+    document.getElementById("cd-s").textContent = pad(s);
+  }
+  tick(); setInterval(tick, 1000);
+
+  // Snow + taffy canvas
+  const canvas = document.getElementById("snow");
+  const ctx = canvas.getContext("2d");
+  let W, H, dpr;
+  const strokes = [];
+
+  function sizeCanvas() {
+    dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    W = rect.width; H = rect.height;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    redraw();
+  }
+
+  // Seeded snow texture so it doesn't change on resize
+  const flakes = Array.from({ length: 260 }, () => ({ x: Math.random(), y: Math.random(), r: Math.random() * 1.8 + .4, a: Math.random() * .25 + .08 }));
+
+  function drawSnow() {
+    ctx.fillStyle = "#F5F8FA";
+    ctx.fillRect(0, 0, W, H);
+    flakes.forEach(f => {
+      ctx.beginPath();
+      ctx.arc(f.x * W, f.y * H, f.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(120,150,170,${f.a})`;
+      ctx.fill();
+    });
+  }
+
+  function drawStroke(pts) {
+    if (pts.length < 2) return;
+    const pass = (color, width, dx, dy) => {
+      ctx.strokeStyle = color; ctx.lineWidth = width;
+      ctx.lineCap = "round"; ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x * W + dx, pts[0].y * H + dy);
+      for (let i = 1; i < pts.length - 1; i++) {
+        const mx = (pts[i].x + pts[i + 1].x) / 2 * W, my = (pts[i].y + pts[i + 1].y) / 2 * H;
+        ctx.quadraticCurveTo(pts[i].x * W + dx, pts[i].y * H + dy, mx + dx, my + dy);
+      }
+      const last = pts[pts.length - 1];
+      ctx.lineTo(last.x * W + dx, last.y * H + dy);
+      ctx.stroke();
+    };
+    const base = Math.max(10, W * 0.028);
+    pass("rgba(80,40,10,.18)", base + 4, 2, 3);   // shadow on snow
+    pass("#9A5314", base, 0, 0);                   // body
+    pass("#C77A24", base * .7, 0, 0);
+    pass("rgba(255,214,150,.75)", base * .18, -base * .15, -base * .15); // gloss
+  }
+
+  function redraw() {
+    drawSnow();
+    strokes.forEach(drawStroke);
+  }
+
+  let current = null;
+  function pos(e) {
+    const r = canvas.getBoundingClientRect();
+    return { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height };
+  }
+  canvas.addEventListener("pointerdown", e => {
+    canvas.setPointerCapture(e.pointerId);
+    current = [pos(e)];
+    strokes.push(current);
+  });
+  canvas.addEventListener("pointermove", e => {
+    if (!current) return;
+    const p = pos(e), last = current[current.length - 1];
+    if (Math.hypot(p.x - last.x, p.y - last.y) > 0.006) { current.push(p); redraw(); }
+  });
+  ["pointerup", "pointercancel"].forEach(t => canvas.addEventListener(t, () => { current = null; }));
+
+  document.getElementById("clearSnow").addEventListener("click", () => { strokes.length = 0; redraw(); });
+
+  // Opening moment: three ribbons poured across the snow
+  function ribbon(y0, phase) {
+    const pts = [];
+    for (let i = 0; i <= 40; i++) {
+      const t = i / 40;
+      pts.push({ x: .12 + t * .76, y: y0 + Math.sin(t * Math.PI * 3 + phase) * .05 });
+    }
+    return pts;
+  }
+  const intro = [ribbon(.28, 0), ribbon(.5, 1.6), ribbon(.72, 3.1)];
+
+  window.addEventListener("resize", sizeCanvas);
+  sizeCanvas();
+
+  if (reduceMotion) {
+    intro.forEach(r => strokes.push(r)); redraw();
+  } else {
+    let ri = 0, pi = 0, live = null;
+    const step = () => {
+      if (ri >= intro.length) return;
+      if (!live) { live = []; strokes.push(live); }
+      live.push(intro[ri][pi++]);
+      redraw();
+      if (pi >= intro[ri].length) { ri++; pi = 0; live = null; setTimeout(() => requestAnimationFrame(step), 180); }
+      else requestAnimationFrame(step);
+    };
+    setTimeout(step, 400);
+  }
+
+  // Registration form (front-end only — connect to a real backend before launch)
+  const form = document.getElementById("regForm");
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    const group = form.group.value;
+    const agree = form.agree.checked;
+    const errs = {
+      name: name ? "" : "Enter your full name.",
+      email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? "" : "Enter an email address like name@mail.mcgill.ca.",
+      group: group ? "" : "Choose how you're joining.",
+      agree: agree ? "" : "Confirm you'll be there for the countdown."
+    };
+    let firstBad = null;
+    Object.entries(errs).forEach(([k, msg]) => {
+      document.getElementById("err-" + k).textContent = msg;
+      const field = form[k];
+      field.setAttribute("aria-invalid", msg ? "true" : "false");
+      if (msg && !firstBad) firstBad = field;
+    });
+    if (firstBad) { firstBad.focus(); return; }
+
+    registered += 1;
+    renderCount();
+    document.getElementById("successName").textContent = name.split(" ")[0];
+    document.getElementById("successEmail").textContent = email;
+    form.style.display = "none";
+    const ok = document.getElementById("success");
+    ok.classList.add("show");
+    ok.focus();
+  });
+</script>
+</body>
+</html>
